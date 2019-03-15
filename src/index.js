@@ -63,7 +63,7 @@ function checkReturnForState(editorState, ev, { insertEmptyBlockOnReturnWithModi
       newEditorState = changeCurrentBlockType(newEditorState, type, text.replace(/\n```\s*$/, ''));
       newEditorState = insertEmptyBlock(newEditorState);
     } else {
-      newEditorState = insertText(editorState, '\n');
+      newEditorState = handleNewCodeBlock(editorState);
     }
   }
   if (editorState === newEditorState) {
