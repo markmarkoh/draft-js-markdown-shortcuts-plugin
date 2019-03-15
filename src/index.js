@@ -8,7 +8,6 @@ import { Map } from 'immutable';
 import adjustBlockDepth from './modifiers/adjustBlockDepth';
 import handleBlockType from './modifiers/handleBlockType';
 import handleInlineStyle from './modifiers/handleInlineStyle';
-import handleNewCodeBlock from './modifiers/handleNewCodeBlock';
 import insertEmptyBlock from './modifiers/insertEmptyBlock';
 import handleLink from './modifiers/handleLink';
 import handleImage from './modifiers/handleImage';
@@ -55,17 +54,6 @@ function checkReturnForState(editorState, ev, { insertEmptyBlockOnReturnWithModi
           || (/^header-/.test(type) && selection.isCollapsed() && selection.getEndOffset() === text.length))) {
     newEditorState = insertEmptyBlock(editorState);
   }
-  if (newEditorState === editorState && type !== 'code-block' && /^```([\w-]+)?$/.test(text)) {
-    newEditorState = handleNewCodeBlock(editorState);
-  }
-  if (newEditorState === editorState && type === 'code-block') {
-    if (/```\s*$/.test(text)) {
-      newEditorState = changeCurrentBlockType(newEditorState, type, text.replace(/\n```\s*$/, ''));
-      newEditorState = insertEmptyBlock(newEditorState);
-    } else {
-      newEditorState = handleNewCodeBlock(editorState);
-    }
-  }
   if (editorState === newEditorState) {
     newEditorState = handleInlineStyle(editorState, '\n');
   }
@@ -76,12 +64,7 @@ const createMarkdownShortcutsPlugin = (config = { insertEmptyBlockOnReturnWithMo
   const store = {};
   return {
     store,
-    blockRenderMap: Map({
-      'code-block': {
-        element: 'code',
-        wrapper: <pre spellCheck={'false'} />
-      }
-    }).merge(checkboxBlockRenderMap),
+    blockRenderMap: checkboxBlockRenderMap,
     decorators: [
       createLinkDecorator(config, store),
       createImageDecorator(config, store)
